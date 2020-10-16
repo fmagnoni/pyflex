@@ -271,6 +271,7 @@ class WindowSelector(object):
                               self.observed.stats.delta,
                               self.config.min_period)
         self.peaks, self.troughs = utils.find_local_extrema(self.stalta)
+        print(self.peaks, self.troughs) #pa
 
         if not len(self.peaks) and len(self.troughs):
             return
@@ -293,6 +294,7 @@ class WindowSelector(object):
             first_trough, last_trough = self.troughs[0], self.troughs[-1]
             self.troughs = self.troughs[(self.troughs >= min_idx) &
                                         (self.troughs <= max_idx)]
+            print(self.troughs) #pa
 
             # If troughs have been removed, readd them add the boundaries.
             if len(self.troughs):
@@ -304,7 +306,14 @@ class WindowSelector(object):
                     self.troughs = np.concatenate([
                         self.troughs,
                         np.array([max_idx], dtype=self.troughs.dtype)])
+            #pa
+            else:
+                self.troughs=np.concatenate([
+                    np.array([min_idx], dtype=self.troughs.dtype),
+                    np.array([max_idx], dtype=self.troughs.dtype)])
+            ##
             # Make sure peaks are inside the troughs!
+            print(self.troughs) #pa
             min_trough, max_trough = self.troughs[0], self.troughs[-1]
             self.peaks = self.peaks[(self.peaks > min_trough) &
                                     (self.peaks < max_trough)]
@@ -837,6 +846,7 @@ class WindowSelector(object):
         # Use an offset to have the seconds since the event as the time axis.
         if self.event:
             offset = self.event.origin_time - self.observed.stats.starttime
+            print("origin time, start time, offset", self.event.origin_time, self.observed.stats.starttime, offset) #fm 28/2/20
         else:
             offset = 0
 
@@ -890,6 +900,8 @@ class WindowSelector(object):
         for win in self.windows:
             l = win.relative_starttime - offset
             r = win.relative_endtime - offset
+            print("win initial extremes", win.relative_starttime, win.relative_endtime) #fm 28/2/20
+            print("win extremes with offset", l, r) #fm 28/2/20
             re = Rectangle((l, plt.ylim()[0]), r - l,
                            plt.ylim()[1] - plt.ylim()[0], color="blue",
                            alpha=(win.max_cc_value ** 2) * 0.25)
